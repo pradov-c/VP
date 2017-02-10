@@ -8,22 +8,21 @@ env.hosts = ['localhost']
 env.user = 'vagrant'
 
 @task
-def deploy():
- """
- Deploy the app to the remote host.
- Steps:
-   1.Change to de app's directory
-   2.Activate virtual env
-   Run south migration
- """
- print("Begining Deploy: ")
- print("base dir: "+BASE_DIR) 
- venv_command = 'source '+ VENV_DIR
- with cd(BASE_DIR):
-  run('virtualenv venmhistory')    
-  run (venv_command)
-  run('pip install django whitenoise')
-  run('python manage.py migrate')
-  run('python manage.py collectstatic --noinput ')
-  run('python manage.py runserver')
+def start():
+    """
+         Start app
+         Steps:
+         1.Activate virtual env
+         2.Run server
+    """
+    print("Start Application: ")
+    print("base dir: "+BASE_DIR)
+    venv_command = 'source '+ VENV_DIR
+    with cd(BASE_DIR):
+        run('virtualenv --no-site-packages venmhistory --always-copy')
+        run (venv_command)
+        run('pip install django whitenoise')
+        run('python manage.py migrate')
+        run('python manage.py collectstatic --noinput ')
+        run('python manage.py runserver')
  
