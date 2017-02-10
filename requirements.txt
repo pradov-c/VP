@@ -1,5 +1,0 @@
-Django>1.6
-virtualenv>1.7
-fabric>1.8.1
-paramiko>2.1.1
-pycrypto>2.5

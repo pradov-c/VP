@@ -21,8 +21,12 @@ def start():
     with cd(BASE_DIR):
         run('virtualenv --no-site-packages venmhistory --always-copy')
         run (venv_command)
-        run('pip install django whitenoise')
-        run('python manage.py migrate')
-        run('python manage.py collectstatic --noinput ')
-        run('python manage.py runserver')
- 
+    run('python ' +  BASE_DIR + 'manage.py collectstatic --noinput')
+    run('python ' +  BASE_DIR + 'manage.py migrate')
+    run('python ' +  BASE_DIR + 'manage.py createsuperuser')
+    run('python ' +  BASE_DIR + 'manage.py runserver')
+
+@task
+def clean():
+    """Cleans Python bytecode"""
+    sudo('find . -name \'*.py?\' -exec rm -rf {} \;')
