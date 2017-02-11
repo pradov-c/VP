@@ -16,15 +16,19 @@ def start():
          2.Run server
     """
     print("Start Application: ")
-    print("base dir: "+BASE_DIR)
     venv_command = 'source '+ VENV_DIR
     with cd(BASE_DIR):
-        run('virtualenv --no-site-packages venmhistory --always-copy')
+        print('run virtualenv venmhistory copu')
+        run('sudo virtualenv --no-site-packages venmhistory --always-copy')
         run (venv_command)
+        run('sudo pip install requests')
+        run('sudo pip install django')
+        run('sudo pip install djangorestframework')
+        run('sudo pip install markdown')
+        run('sudo pip install django-filter')
     run('python ' +  BASE_DIR + 'manage.py collectstatic --noinput')
     run('python ' +  BASE_DIR + 'manage.py migrate')
-    run('python ' +  BASE_DIR + 'manage.py createsuperuser')
-    run('python ' +  BASE_DIR + 'manage.py runserver')
+
 
 @task
 def clean():

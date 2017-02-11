@@ -26,8 +26,5 @@ admin.autodiscover()
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^patients/', views.PatientList.as_view()),
-    url(r'^patients//(?P<pk>[0-9]+)/$', views.PatientDetail.as_view()),
-   # url(r'^', include(router.urls)),
-   # url(r'^', include(router.urls)),
+    url(r'^', include('appmhistory.urls')),
 ]
