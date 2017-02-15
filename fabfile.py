@@ -29,7 +29,8 @@ def start():
 @task
 def clean():
     """Cleans Python bytecode"""
-    sudo('find . -name \'*.py?\' -exec rm -rf {} \;')
+    local('find . -name \'*.py?\' -exec rm -rf {} \;', shell=env.shell)
+    local('rm -rf ' + BASE_DIR + 'venmhistory' , shell=env.shell)
 
 @task
 def runDjangoServer():
