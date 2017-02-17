@@ -3,3 +3,5 @@ recursive-exclude * *.py[co]
 recursive-exclude __pycache__
 recursive-exclude .DS_Store
 recursive-exclude .gitignore
+recursive-include appmhistory/static *
+recursive-include appmhistory/templates *

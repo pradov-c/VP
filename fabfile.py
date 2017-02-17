@@ -1,13 +1,13 @@
 import os
 from fabric.api import local, task, sudo, run, env, cd
-from fabric.decorators import runs_once
 BASE_DIR = os.path.sep.join((os.path.dirname(__file__),''))
 VENV_DIR = os.path.join(BASE_DIR,'venmhistory/bin/activate')
-env.password = 'vagrant'
+env.project_name = 'MedicalHistory'
 env.hosts = ['localhost']
 env.user = 'vagrant'
 env.shell = "/bin/bash"
 VENV_COMMAND = 'source '+ VENV_DIR
+
 
 @task
 def start():
@@ -18,19 +18,29 @@ def start():
          4. createdb sqlLite
     """
     print("Start Application: ")
-    venv_command = 'source '+ VENV_DIR
     with cd(BASE_DIR):
+        local('sudo pip install virtualenv', shell=env.shell)
         local('virtualenv --no-site-packages venmhistory --always-copy', shell=env.shell)
         local(VENV_COMMAND, shell=env.shell)
-    local('python ' + BASE_DIR + 'manage.py collectstatic --noinput', shell=env.shell)
-    local('python ' +  BASE_DIR + 'manage.py syncdb --noinput', shell=env.shell)
-
+        local('sudo pip install django', shell=env.shell)
+        local('sudo pip install djangorestframework', shell=env.shell)
+        local('sudo pip install markdown', shell=env.shell)
+        local('sudo pip install django-filter', shell=env.shell)
+        local('sudo pip install behave', shell=env.shell)
+        local('sudo pip install django-behave', shell=env.shell)
+        local('sudo pip install unittest-xml-reporting', shell=env.shell)
+        local('sudo pip install requests', shell=env.shell)
+        local('python ' + BASE_DIR + 'manage.py collectstatic --noinput', shell=env.shell)
+        local('python ' +  BASE_DIR + 'manage.py migrate', shell=env.shell)
 
 @task
 def clean():
     """Cleans Python bytecode"""
-    local('find . -name \'*.py?\' -exec rm -rf {} \;', shell=env.shell)
+    local('find . -name \'*.pyc\' -exec rm -rf {} \;', shell=env.shell)
     local('rm -rf ' + BASE_DIR + 'venmhistory' , shell=env.shell)
+    local('rm ' + BASE_DIR + 'db.sqlite3' , shell=env.shell)
+    local('rm ' + BASE_DIR + '*.xml' , shell=env.shell)
+    local('rm ' + BASE_DIR + '*.xml' , shell=env.shell)
 
 @task
 def runDjangoServer():
@@ -39,5 +49,15 @@ def runDjangoServer():
 
 @task
 def runUnitTest():
-    local('python ' + BASE_DIR + 'appmhistory/tests/test_unitTest.py',shell=env.shell)
+    local(VENV_COMMAND, shell=env.shell)
+    local('python ' + BASE_DIR + 'manage.py test appmhistory/tests',shell=env.shell)
 
+@task
+def runServer():
+    local(VENV_COMMAND, shell=env.shell)
+    local('nohup python ' + BASE_DIR + 'manage.py runserver &', shell=env.shell)
+
+@task
+def runAcceptanceTest():
+    local(VENV_COMMAND, shell=env.shell)
+    local('behave ' + BASE_DIR + 'appmhistory/features/register.feature',shell=env.shell)

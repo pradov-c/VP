@@ -1,22 +1,24 @@
+from __future__ import unicode_literals
+from appmhistory.models import Patient
 import unittest
-import requests
 import xmlrunner
+import six
+
+def register_Patient(name, ci, register_date):
+    return Patient.objects.create(name=name, ci=ci, register_date= register_date)
+
 
 class TestViews(unittest.TestCase):
-    def setUp(self):
-        self.command = 'curl'
-        self.server = 'http://127.0.0.1'
-        self.port = '8000'
-        self.application_name = '/appmhistory'
-        print('Init test')
+    def test_PatientName_is_String(self):
+        self.patient = register_Patient('Jhon Perez', '456', '2017-01-21')
+        isPass = False
+        if isinstance(self.patient.name, six.string_types):
+            isPass = True
+        self.assertTrue(isPass)
 
-    def test_request_POST(self):
-        res = requests.post(self.server + ':' + self.port + self.application_name + '/', headers='', data= {'name':'Maria Perez', 'ci':'451','register_date':'2017-01-13'})
-        self.assertTrue(res.status_code == 201)
-
-    def test_request_GET(self):
-        res = requests.get(self.server + ':' + self.port + self.application_name + '/', headers='')
-        self.assertTrue(res.status_code == 200)
+    def test_Patient_name(self):
+        self.patient = register_Patient('Jhon Perez1', '457', '2017-01-21')
+        self.assertEqual(self.patient.name, 'Jhon Perez1')
 
 if __name__ == '__main__':
      unittest.main(testRunner=xmlrunner.XMLTestRunner(output='test-reports'))
