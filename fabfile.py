@@ -34,13 +34,18 @@ def start():
         local('python ' +  BASE_DIR + 'manage.py migrate', shell=env.shell)
 
 @task
-def clean():
+def cleanAll():
     """Cleans Python bytecode"""
     local('find . -name \'*.pyc\' -exec rm -rf {} \;', shell=env.shell)
     local('rm -rf ' + BASE_DIR + 'venmhistory' , shell=env.shell)
     local('rm ' + BASE_DIR + 'db.sqlite3' , shell=env.shell)
     local('rm ' + BASE_DIR + '*.xml' , shell=env.shell)
+
+
+@task
+def cleanReports():
     local('rm ' + BASE_DIR + '*.xml' , shell=env.shell)
+    
 
 @task
 def runDjangoServer():
