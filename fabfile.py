@@ -1,6 +1,7 @@
 import os
 from fabric.api import local, task, sudo, run, env, cd
 BASE_DIR = os.path.sep.join((os.path.dirname(__file__),''))
+BASE_WORKSPACE = ''
 VENV_DIR = os.path.join(BASE_DIR,'venmhistory/bin/activate')
 env.project_name = 'MedicalHistory'
 env.hosts = ['localhost']
@@ -39,13 +40,13 @@ def cleanAll():
     local('find . -name \'*.pyc\' -exec rm -rf {} \;', shell=env.shell)
     local('rm -rf ' + BASE_DIR + 'venmhistory' , shell=env.shell)
     local('rm ' + BASE_DIR + 'db.sqlite3' , shell=env.shell)
-    local('rm ' + BASE_DIR + '*.xml' , shell=env.shell)
+    local('rm ' + BASE_DIR + '*.html' , shell=env.shell)
 
 
 @task
 def cleanReports():
-    local('rm ' + BASE_DIR + '*.xml' , shell=env.shell)
-    
+    local('rm ' + BASE_DIR + '*.html' , shell=env.shell)
+
 
 @task
 def runDjangoServer():
@@ -65,4 +66,20 @@ def runServer():
 @task
 def runAcceptanceTest():
     local(VENV_COMMAND, shell=env.shell)
-    local('behave ' + BASE_DIR + 'appmhistory/features/register.feature',shell=env.shell)
+    local('nohup python ' + BASE_DIR + 'manage.py runserver & behave ' + BASE_DIR + 'appmhistory/features/register.feature', shell=env.shell)
+
+@task
+def packageApplication():
+    local('sudo python setup.py sdist')
+
+@task
+def deployApp(var_work_space,var_artifactFolder, var_artifact):
+    local('mkdir -p '+var_work_space, shell=env.shell)
+    local('cp ' + var_artifactFolder + '/' + var_artifact + ' '+var_work_space +'/' + var_artifact) #copy artifact to current workspace
+    local('tar -xzf '+var_work_space +'/'+ var_artifact + ' -C '+ var_work_space + '/') #unzip artifact on mhistoryAPP
+    BASE_WORKSPACE = var_work_space
+
+
+@task
+def cleanWorkSpace(var_work_space):
+    local('rm -rf '+var_work_space, shell=env.shell)

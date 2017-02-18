@@ -1,7 +1,5 @@
 include README LICENSE
-recursive-exclude * *.py[co]
-recursive-exclude __pycache__
-recursive-exclude .DS_Store
-recursive-exclude .gitignore
+include *.sqlite*
+include manage.*
 recursive-include appmhistory/static *
 recursive-include appmhistory/templates *
