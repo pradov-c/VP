@@ -1,7 +1,7 @@
 import os
 from fabric.api import local, task, sudo, run, env, cd
 BASE_DIR = os.path.sep.join((os.path.dirname(__file__),''))
-BASE_WORKSPACE = ''
+BASE_DEPLOY_ENV = ''
 VENV_DIR = os.path.join(BASE_DIR,'venmhistory/bin/activate')
 env.project_name = 'MedicalHistory'
 env.hosts = ['localhost']
@@ -50,7 +50,10 @@ def cleanReports():
 
 @task
 def runDjangoServer():
-    local(VENV_COMMAND, shell=env.shell)
+    if BASE_DEPLOY_ENV is '':
+        local('source venmhistory/bin/activate', shell=env.shell)
+    else:
+        local('source ' +BASE_DEPLOY_ENV + '/venmhistory/bin/activate', shell=env.shell)
     local('python '+ BASE_DIR + 'manage.py runserver', shell=env.shell)
 
 @task
@@ -64,20 +67,20 @@ def runServer():
     local('nohup python ' + BASE_DIR + 'manage.py runserver &', shell=env.shell)
 
 @task
-def runAcceptanceTest():
-    local(VENV_COMMAND, shell=env.shell)
-    local('nohup python ' + BASE_DIR + 'manage.py runserver & behave ' + BASE_DIR + 'appmhistory/features/register.feature', shell=env.shell)
+def runAcceptanceTest(var_deploy_folder):
+    local('source ' +var_deploy_folder + '/venmhistory/bin/activate', shell=env.shell)
+    local('nohup python ' + var_deploy_folder + 'manage.py runserver & behave ' + BASE_DIR + 'appmhistory/features/register.feature', shell=env.shell)
 
 @task
 def packageApplication():
     local('sudo python setup.py sdist')
 
 @task
-def deployApp(var_work_space,var_artifactFolder, var_artifact):
-    local('mkdir -p '+var_work_space, shell=env.shell)
-    local('cp ' + var_artifactFolder + '/' + var_artifact + ' '+var_work_space +'/' + var_artifact) #copy artifact to current workspace
-    local('tar -xzf '+var_work_space +'/'+ var_artifact + ' -C '+ var_work_space + '/') #unzip artifact on mhistoryAPP
-    BASE_WORKSPACE = var_work_space
+def deployApp(var_deployFolder, var_artifact):
+    local('mkdir -p '+var_deployFolder, shell=env.shell)
+    local('tar -xzf '+ var_artifact + ' -C '+ var_deployFolder + '/') #unzip artifact on mhistoryAPP
+    BASE_DEPLOY_ENV =  os.path.join(BASE_DIR,var_deployFolder)
+
 
 
 @task
