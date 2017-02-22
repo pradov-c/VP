@@ -1,5 +1,5 @@
 import os
-from fabric.api import local, task, sudo, run, env, cd
+from fabric.api import local, task, sudo, run, env, cd, lcd
 BASE_DIR = os.path.sep.join((os.path.dirname(__file__),''))
 BASE_DEPLOY_ENV = ''
 VENV_DIR = os.path.join(BASE_DIR,'venmhistory/bin/activate')
@@ -11,18 +11,22 @@ VENV_COMMAND = 'source '+ VENV_DIR
 
 
 @task
-def start():
+def start(var_app_folder=''):
     """
          1.Activate virtual env
          2.Run server
          3.Collecstatic
          4. createdb sqlLite
     """
-    print("Start Application: ")
-    with cd(BASE_DIR):
+    global BASE_DIR
+    if(var_app_folder != ''):
+       BASE_DIR = os.path.sep.join((os.path.dirname(__file__),var_app_folder))+'/'
+    print("Start Application: "+BASE_DIR)
+    with lcd(BASE_DIR):
+        local('ls',shell=env.shell)
         local('sudo pip install virtualenv', shell=env.shell)
         local('virtualenv --no-site-packages venmhistory --always-copy', shell=env.shell)
-        local(VENV_COMMAND, shell=env.shell)
+        local('source venmhistory/bin/activate', shell=env.shell)
         local('sudo pip install django', shell=env.shell)
         local('sudo pip install djangorestframework', shell=env.shell)
         local('sudo pip install markdown', shell=env.shell)
@@ -64,22 +68,21 @@ def runUnitTest():
 @task
 def runServer():
     local(VENV_COMMAND, shell=env.shell)
-    local('nohup python ' + BASE_DIR + 'manage.py runserver &', shell=env.shell)
+    local('nohup python ' + BASE_DIR + 'manage.py runserver & ', shell=env.shell)
 
 @task
 def runAcceptanceTest(var_deploy_folder):
+    var_deploy_folder = os.path.sep.join((os.path.dirname(__file__),var_deploy_folder))
     local('source ' +var_deploy_folder + '/venmhistory/bin/activate', shell=env.shell)
-    local('nohup python ' + var_deploy_folder + 'manage.py runserver & behave ' + BASE_DIR + 'appmhistory/features/register.feature', shell=env.shell)
+    local('nohup python manage.py runserver & ' + var_deploy_folder + '/appmhistory/features/register.feature', shell=env.shell)
 
 @task
 def packageApplication():
     local('sudo python setup.py sdist')
 
 @task
-def deployApp(var_deployFolder, var_artifact):
-    local('mkdir -p '+var_deployFolder, shell=env.shell)
-    local('tar -xzf '+ var_artifact + ' -C '+ var_deployFolder + '/') #unzip artifact on mhistoryAPP
-    BASE_DEPLOY_ENV =  os.path.join(BASE_DIR,var_deployFolder)
+def deployApp(var_artifact):
+    local('tar -xzf '+ var_artifact ) #unzip artifact
 
 
 

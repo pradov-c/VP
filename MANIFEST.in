@@ -1,5 +1,4 @@
 include README LICENSE
-include *.sqlite*
 include manage.*
 recursive-include appmhistory/static *
 recursive-include appmhistory/templates *
