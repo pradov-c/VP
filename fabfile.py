@@ -1,5 +1,5 @@
 import os
-from fabric.api import local, task, sudo, run, env, cd
+from fabric.api import local, task, sudo, run, env, cd, lcd
 BASE_DIR = os.path.sep.join((os.path.dirname(__file__),''))
 VENV_DIR = os.path.join(BASE_DIR,'venmhistory/bin/activate')
 env.project_name = 'MedicalHistory'
