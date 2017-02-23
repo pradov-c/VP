@@ -10,18 +10,22 @@ VENV_COMMAND = 'source '+ VENV_DIR
 
 
 @task
-def start():
+def start(var_app_folder=''):
     """
          1.Activate virtual env
          2.Run server
          3.Collecstatic
          4. createdb sqlLite
     """
-    print("Start Application: ")
-    with cd(BASE_DIR):
+    global BASE_DIR
+    if(var_app_folder != ''):
+       BASE_DIR = os.path.sep.join((os.path.dirname(__file__),var_app_folder))+'/'
+    print("Start Application: "+BASE_DIR)
+    with lcd(BASE_DIR):
+        local('ls',shell=env.shell)
         local('sudo pip install virtualenv', shell=env.shell)
         local('virtualenv --no-site-packages venmhistory --always-copy', shell=env.shell)
-        local(VENV_COMMAND, shell=env.shell)
+        local('source venmhistory/bin/activate', shell=env.shell)
         local('sudo pip install django', shell=env.shell)
         local('sudo pip install djangorestframework', shell=env.shell)
         local('sudo pip install markdown', shell=env.shell)
@@ -32,6 +36,7 @@ def start():
         local('sudo pip install requests', shell=env.shell)
         local('python ' + BASE_DIR + 'manage.py collectstatic --noinput', shell=env.shell)
         local('python ' +  BASE_DIR + 'manage.py migrate', shell=env.shell)
+
 
 @task
 def cleanAll():
