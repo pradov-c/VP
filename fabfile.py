@@ -71,7 +71,8 @@ def runServer():
 def runAcceptanceTest(var_deploy_folder):
     var_deploy_folder = os.path.sep.join((os.path.dirname(__file__),var_deploy_folder))
     local('source ' +var_deploy_folder + '/venmhistory/bin/activate', shell=env.shell)
-    local('nohup python '+var_deploy_folder+'/manage.py runserver & behave -junit features/register.feature', shell=env.shell)
+    local('nohup python '+var_deploy_folder+'/manage.py runserver & behave --junit features/register.feature', shell=env.shell)
+    local('lsof -t -i tcp:8000 | xargs kill -9',shell=env.shell)
 
 @task
 def packageApplication():
