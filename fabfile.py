@@ -55,7 +55,7 @@ def cleanReports():
 @task
 def runDjangoServer():
     local(VENV_COMMAND, shell=env.shell)
-    local('python '+ BASE_DIR + 'manage.py runserver', shell=env.shell)
+    local('nohup python manage.py runserver & ls', shell=env.shell)
 
 @task
 def runUnitTest():
@@ -69,10 +69,7 @@ def runServer():
 
 @task
 def runAcceptanceTest(var_deploy_folder):
-    var_deploy_folder = os.path.sep.join((os.path.dirname(__file__),var_deploy_folder))
-    local('source ' +var_deploy_folder + '/venmhistory/bin/activate', shell=env.shell)
-    local('nohup python '+var_deploy_folder+'/manage.py runserver & behave --junit features/register.feature', shell=env.shell)
-    local('lsof -t -i tcp:8000 | xargs kill -9',shell=env.shell)
+    local('behave --junit features/register.feature', shell=env.shell)
 
 @task
 def packageApplication():
